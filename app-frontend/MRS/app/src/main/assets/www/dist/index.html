@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+    <link href="style.css" rel="stylesheet">
+    <link href="modal.css" rel="stylesheet">
+    <title>movie recommend</title>
+</head>
+
+<body>
+    <div class="menu">
+        <p id="m-cat">電影<br>類別</p>
+        <p id="m-emo">個人<br>資料</p>
+        <p id="m-list">觀看<br>清單</p>
+        <p id="m-rate">評分<br>紀路</p>
+        <p id="m-rec">回到<br>首頁</p>
+    </div>
+
+    <div class="top">
+        <form id="search">
+            <input type="image" src="image/magnifier.png" alt="Submit Form">
+            <input type="text" name="sss" placeholder="電影名稱">
+        </form>
+    </div>
+
+
+
+    <div class="box" id="cat">
+        <c class="close"></c><br>
+        <category>Action
+            <id style="display:none">28</id>
+        </category> <br>
+        <category>Adventure
+            <id style="display:none">12</id>
+        </category> <br>
+        <category>Animation
+            <id style="display:none">16</id>
+        </category> <br>
+        <category>Comedy
+            <id style="display:none">35</id>
+        </category> <br>
+        <category>Crime
+            <id style="display:none">80</id>
+        </category> <br>
+        <category>Documentary
+            <id style="display:none">99</id>
+        </category> <br>
+        <category>Drama
+            <id style="display:none">18</id>
+        </category> <br>
+        <category>Family
+            <id style="display:none">10751</id>
+        </category> <br>
+        <category>Fantasy
+            <id style="display:none">14</id>
+        </category> <br>
+        <category>History
+            <id style="display:none">36</id>
+        </category> <br>
+        <category>Horror
+            <id style="display:none">27</id>
+        </category> <br>
+        <category>Music
+            <id style="display:none">10402</id>
+        </category> <br>
+        <category>Mystery
+            <id style="display:none">9648</id>
+        </category> <br>
+        <category>Romance
+            <id style="display:none">10749</id>
+        </category> <br>
+        <category>Science Fiction
+            <id style="display:none">878</id>
+        </category> <br>
+        <category>TV Movie
+            <id style="display:none">10770</id>
+        </category> <br>
+        <category>Thriller
+            <id style="display:none">53</id>
+        </category> <br>
+        <category>War
+            <id style="display:none">10752</id>
+        </category> <br>
+        <category>Western
+            <id style="display:none">37</id>
+        </category> <br>
+    </div>
+
+    <div class="box" id="emo">
+        <c class="close"></c>
+        <p id="helloname">Hello! name<br></p>
+
+        <p>根據影像辨識的結果：</p>
+        <br>中性：
+        <e id="neutral">0.0</e>
+        <br>幸福：
+        <e id="happiness">0.0</e>
+        <br>驚喜：
+        <e id="surprise">0.0</e>
+        <br>難過：
+        <e id="sadness">0.0</e>
+        <br>憤怒：
+        <e id="anger">0.0</e>
+        <br>厭惡：
+        <e id="disgust">0.0</e>
+        <br>恐懼：
+        <e id="fear">0.0</e>
+        <br>蔑視：
+        <e id="contempt">0.0</e>
+        <p>推薦電影</p>
+    </div>
+
+
+    <div class="bottom">
+        <div class="box" id="list">
+            <p class="title"><strong>我的觀看清單</strong></p>
+            <div id="unwatch" class="result">
+                <!--div class="col">
+                    <img src="https://fakeimg.pl/145x215/">
+                    <p class="mtitle">電影名稱</p>
+                </div-->
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom">
+        <div class="box" id="rate">
+            <p class="title"><strong>評分過</strong></p>
+            <div id="rated" class="result">
+                <!--div class="col">
+                    <img src="https://fakeimg.pl/145x215/">
+                    <p class="mtitle">電影名稱</p>
+                </div-->
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom">
+        <div class="box" id="rec">
+            <p class="title"><strong>本週熱門</strong></p>
+            <div id="top" class="rec">
+
+            </div>
+            <p class="title"><strong>推薦...</strong></p>
+            <div id="bpr" class="rec">
+
+            </div>
+            <p class="title"><strong>根據情緒推薦</strong></p>
+            <div id="em" class="rec">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom">
+        <div class="box" id="result">
+            <p class="title"><strong>共幾筆搜尋結果</strong></p>
+            <div class="result">
+
+            </div>
+
+        </div>
+    </div>
+
+    <!--div class="bottom">
+        <div class="box" id="info">
+            <p class="title"><strong>title</strong></p>
+            <div class="info">
+                <img src="https://fakeimg.pl/145x215/">
+                <div class="mtitle">電影名稱</div>
+                <div class="data">電影名稱</div>
+                <div class="data">intro</div>
+                <div class="ui rating" data-max-rating=""></div>
+            </div>
+
+        </div>
+    </div-->
+    <div class="modal">
+        <div class="modal-overlay modal-toggle">
+            <div class="swipe">
+                <img class="swipeimg" style="width:8vw; position:absolute; top:40vh; left:0; opacity:0.4 ;" src="image/whi.png">
+                <div class="more">
+
+
+                </div>
+            </div>
+        </div>
+        <div class="modal-wrapper modal-transition">
+            <id style="display:none"></id>
+            <div class="modal-header">
+                <img src="https://fakeimg.pl/400x100/">
+                <p id="title">title</p>
+                <c class="close"></c>
+                <div class="modal-rate"></div>
+                <span class="tooltiptext">Rated!</span>
+                <div class='rating-stars text-center'>
+                    <ul id='stars'>
+                        <li class='star' data-value='1'>
+                            <i class='fa fa-star fa-fw'></i>
+                        </li>
+                        <li class='star' data-value='2'>
+                            <i class='fa fa-star fa-fw'></i>
+                        </li>
+                        <li class='star' data-value='3'>
+                            <i class='fa fa-star fa-fw'></i>
+                        </li>
+                        <li class='star' data-value='4'>
+                            <i class='fa fa-star fa-fw'></i>
+                        </li>
+                        <li class='star' data-value='5'>
+                            <i class='fa fa-star fa-fw'></i>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="modal-body">
+                <!--img class="m-poster " src="https://fakeimg.pl/300x396/ "-->
+                <div class="modal-content">
+                    <div class="modal-info">
+                        <p id="year">year</p>
+                        <p id="lang">lang</p>
+                        <p id="genres">genres</p>
+
+                        <div class="m-button ">
+                            <button><span style="font-family: 'Kosugi Maru', sans-serif">加入觀看清單</span></button>
+                            <ul id="list ">
+
+                            </ul>
+                        </div>
+                    </div>
+                    <p id="overview">overview</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <script src="modal.js "></script>
+
+    <script src="data.js "></script>
+    <!--data initilize-->
+    <script src="user.js "></script>
+    <!--add to watch list + database-->
+    <script src="index.js "></script>
+
+    <!--others-->
+</body>
+<!--script type="text/javascript">
+    function init(val) {
+        console.log("hi " + val);
+        if (val != null) {
+            localStorage.setItem('name', val);
+            //localStorage.getItem('name');
+        }
+    }
+</script-->
+
+</html>

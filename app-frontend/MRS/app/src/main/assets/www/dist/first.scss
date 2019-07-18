@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css?family=Noto+Sans+TC|Kosugi+Maru|Open+Sans|Poppins:600|Lato:700|Roboto:900|Palanquin:600,700,400");
+body {
+    font-family: "Kosugi Maru", sans-serif;
+    background-color: #F8F8F8;
+    position: relative;
+}
+
+.head {
+    background-color: #FFE375;
+    height: 500px;
+    position: relative;
+    &__title {
+        position: absolute;
+        top: 330px;
+        left: 180px;
+        font-size: 90px;
+        font-weight: 800;
+    }
+    &__content {
+        position: absolute;
+        bottom: 50px;
+        left: 250px;
+        font-size: 20px;
+        font-weight: 800;
+    }
+}
+
+.input.one {
+    position: absolute;
+    top: 550px;
+    font-size: 20px;
+    height: 30px;
+    left: 400px;
+    input[type=text] {
+        font-family: "Kosugi Maru", sans-serif;
+        font-size: 20px;
+        height: 40px;
+        width: 350px;
+        padding: 0px 15px;
+        /*background: #F5F5F5;*/
+        border: 0 none;
+        cursor: pointer;
+        -webkit-border-radius: 5px;
+        border-radius: 20px;
+    }
+}
+
+.input.two {
+    position: absolute;
+    top: 190px;
+    font-size: 20px;
+    left: 90px;
+    .grid {
+        width: 1200px;
+        .column {
+            height: 130px;
+        }
+        p {
+            font-size: 20px;
+            position: absolute;
+            padding-left: 10px;
+            top: 100px;
+            left: 12px;
+            width: 203px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            background: #FFE375;
+        }
+        .box {
+            background: #000;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);
+        }
+        .click {
+            opacity: 0.5;
+        }
+    }
+}
+
+.input.three {
+    position: absolute;
+    top: 190px;
+    font-size: 20px;
+    left: 90px;
+    .grid {
+        width: 1200px;
+        .column {
+            height: 300px;
+        }
+        p {
+            position: absolute;
+            top: 320px;
+            font-size: 22px;
+            font-family: 'Poppins', sans-serif;
+            left: 20px;
+        }
+        .box {
+            background: #000;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);
+        }
+        .click {
+            opacity: 0.5;
+        }
+    }
+}
+
+.button {
+    position: absolute;
+    border: none;
+    top: 620px;
+    left: 950px;
+    background-color: #FFE375;
+    color: white;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    width: 130px;
+    border-radius: 15px;
+    font-size: 20px;
+    font-weight: 800;
+}
