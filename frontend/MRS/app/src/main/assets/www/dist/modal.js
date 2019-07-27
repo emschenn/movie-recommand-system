@@ -101,7 +101,7 @@ $('.m-button').on('click', function(e) {
         $(".m-button span").text("加入觀看清單");
         $(".m-button>button").attr('data-value', '移除成功');
         $.ajax({
-            url: "http://192.168.210.10:8000/remove_favorite/",
+            url: "http://192.168.210.22:8000/remove_favorite/",
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(json),
@@ -120,7 +120,7 @@ $('.m-button').on('click', function(e) {
         });
     } else {
         $.ajax({
-            url: "http://192.168.210.10:8000/update_favorite/",
+            url: "http://192.168.210.22:8000/update_favorite/",
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(json),
@@ -165,7 +165,7 @@ $('#stars li').on('click', function() {
     json["tmdbId"] = id;
     console.log(json);
     $.ajax({
-        url: "http://192.168.210.10:8000/update_rating/",
+        url: "http://192.168.210.22:8000/update_rating/",
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(json),

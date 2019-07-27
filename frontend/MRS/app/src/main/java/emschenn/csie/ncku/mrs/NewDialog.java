@@ -35,9 +35,9 @@ public class NewDialog extends AppCompatActivity {
         webView.setWebChromeClient(new WebChromeClient());
         //webView.loadDataWithBaseURL(getAssets(),s, "text/html", "utf-8", null);
         webView.loadUrl("file:///android_asset/www/dist/first.html");
-        webView.setWebViewClient(new WebViewClient(){
-            public void onPageFinished(WebView view, String url){
-               // webView.loadUrl("javascript:init('" + pic + "')");
+        webView.setWebViewClient(new WebViewClient() {
+            public void onPageFinished(WebView view, String url) {
+                // webView.loadUrl("javascript:init('" + pic + "')");
             }
 
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
