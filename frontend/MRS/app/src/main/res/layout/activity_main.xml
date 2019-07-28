@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:screenOrientation="landscape"
@@ -12,6 +13,7 @@
         android:id="@+id/textureView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -19,10 +21,35 @@
         android:id="@+id/button"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginTop="176dp"
         android:background="@drawable/camera"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:layout_editor_absoluteY="176dp" />
+
+    <TextView
+        android:id="@+id/mainTitle"
+        android:layout_width="fill_parent"
+        android:layout_height="36dp"
+        android:layout_marginTop="600dp"
+        android:gravity="center"
+        android:text="輕觸螢幕以拍攝人像"
+        android:textColor="#ffffff"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="@+id/textureView"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/mainSubtitle"
+        android:layout_width="fill_parent"
+        android:layout_height="35dp"
+        android:layout_marginTop="640dp"
+        android:gravity="center"
+        android:text="注意臉部清楚無遮蔽以供系統正確辨識"
+        android:textColor="#CCffffff"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
 
 </android.support.constraint.ConstraintLayout>

@@ -6,11 +6,36 @@
 
     </style>
     <style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="colorPrimary">#000000</item>
+        <!-- Used for the buttons -->
+        <item name="colorAccent">#FFE375
+        </item>
+        <!-- Used for the title and text -->
+        <item name="android:textColorPrimary">#494949</item>
+        <!-- Used for the background -->
+        <item name="android:textSize">20sp</item>
+
+        <item name="android:background">#F8F8F8</item>
+        <item name="android:windowTitleStyle">@style/MyTitleTextStyle</item>
+
     </style>
     <style name="AppTheme.FullScreen">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
+    </style>
+    <style name="MyTitleTextStyle">
+        <item name="android:textColor">#000000</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
+    </style>
+
+    <style name="ProgressBarStyle">
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="MyAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@color/colorAccent</item>
     </style>
 </resources>

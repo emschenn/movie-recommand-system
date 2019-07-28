@@ -2,6 +2,7 @@ package emschenn.csie.ncku.mrs;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -28,16 +30,25 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,10 +99,13 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     int time = 0;
     private static final String TAG = "AndroidCameraApi";
-    private String SERVER_URL = "http://192.168.210.10:8000/post/";
+    private String SERVER_URL = "http://192.168.210.22:8000/post/";
     private Button takePictureButton;
     private TextureView textureView;
+    private TextView mainTitle, mainSubtitle;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+    private String sendImg;
+    private JSONObject sendJson = new JSONObject();
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -124,6 +138,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private View dialogView;
+    private Dialog dialog;
+    private ProgressBar progressBar;
+    private Button cancel, enter;
+    private TextView waiting, title, subtitle;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,26 +153,18 @@ public class MainActivity extends AppCompatActivity {
         //    mRobotAPI.robot.speak("第二張");
         mRobotAPI.robot.setTouchOnlySignal(true);
         mRobotAPI.robot.setVoiceTrigger(false);
-        textureView = (TextureView) findViewById(R.id.textureView);
+        textureView = findViewById(R.id.textureView);
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
-        takePictureButton = (Button) findViewById(R.id.button);
-        assert takePictureButton != null;
-        takePictureButton.setOnClickListener(new View.OnClickListener() {
+        takePictureButton = findViewById(R.id.button);
+        mainSubtitle = findViewById(R.id.mainSubtitle);
+        mainTitle = findViewById(R.id.mainTitle);
+        ConstraintLayout layout = findViewById(R.id.mainlayout);
+        layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("eee", "ffff");
                 takePicture();
-            //    closeCamera();
-
-//                FisrtUseDialog dialog = new FisrtUseDialog();
-//                dialog.show(getSupportFragmentManager(),"first use dialog");
-//                Intent intent = new Intent(MainActivity.this, FirstUse.class);
-//                startActivity(intent);
-//                MainActivity.this.finish();
-//                closeCamera();
-//                Intent intent = new Intent(MainActivity.this, FirstUse.class);
-//                startActivity(intent);
-//                MainActivity.this.finish();
             }
         });
         pDialog = new ProgressDialog(this);
@@ -259,15 +272,20 @@ public class MainActivity extends AppCompatActivity {
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
                         save(bytes);
-                        String img = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT);
-
+                        //String img = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT);
+                        sendImg = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT);
                         //sendImg(bytes);
-                        Log.d("upload pic",img);
-                        upload(img);
+                        Log.d("upload pic", sendImg);
+                        sendJson.put("img", sendImg);
+
+                        //showDialog();
+                        new upload().execute(SERVER_URL);
 
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     } finally {
                         if (image != null) {
@@ -300,7 +318,6 @@ public class MainActivity extends AppCompatActivity {
                     if (faces != null && mode != null) {
                         Log.e("tag", "faces : " + faces.length + " , mode : " + mode);
                     }
-
                 }
             };
             cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {
@@ -428,102 +445,170 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    private void upload(final String msg) {
-        RequestQueue queue = Volley.newRequestQueue(this);
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("img", msg);
-        } catch (JSONException e) {
-            e.printStackTrace();
+    class upload extends AsyncTask<String, Integer, String> {
+        // <傳入參數, 處理中更新介面參數, 處理後傳出參數>
+        private static final int TIME_OUT = 1000;
+        String jsonString1 = "";
+        private Handler myHandler;
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            myHandler = new Handler();
+            Log.d("thread", String.valueOf(Thread.currentThread().getId()));
+            //mainSubtitle.setVisibility(View.INVISIBLE);
+            //mainTitle.setVisibility(View.INVISIBLE);
+            initDialog();
+            dialog.show();
         }
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
-                SERVER_URL, jsonObject, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    Log.d("GET response 111",response.toString());
-                    faceDetect(response.get("success").toString(),response.get("name").toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
+
+        @Override
+        protected String doInBackground(String... countTo) {
+            // TODO Auto-generated method stub
+            // 再背景中處理的耗時工作
+            try {
+//                int k = 0, j = 0;
+//                publishProgress(10);
+//                while (j < 10000) {
+//                    publishProgress(k);
+//                    j++;
+//                    if (j % 100 == 0) {
+//                        k++;
+//                    }
+//                }
+                URL url = new URL(countTo[0]);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json; utf-8");
+                con.setRequestProperty("Accept", "application/json");
+                con.setDoOutput(true);
+                String jsonInputString = sendJson.toString();
+                try (OutputStream os = con.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    int i = 0;
+                    int offset = 0;
+                    int buflen = input.length / 100;
+                    while (i < 100) {
+                        publishProgress(i);
+                        os.write(input, offset, buflen);
+                        offset += buflen;
+                        i++;
+                    }
+                    os.write(input, offset, input.length % 100);
+                    publishProgress(100);
+                    //os.write(input, 0, input.length);
                 }
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    System.out.println(response.toString());
+                    jsonString1 = response.toString();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "網路中斷" + e;
             }
-        }, new Response.ErrorListener() {
+            return jsonString1;
+        }
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("why",error.getMessage());
+
+        public void onPostExecute(String result) {
+            super.onPostExecute(result);
+            try {
+                JSONObject json = new JSONObject(result);
+                final String success = json.getString("success");
+                final String name = json.getString("name");
+                myHandler.post(new Runnable() {
+                    public void run() {
+                        updateDialog(success, name);
+                    }//run
+                });
+
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                20000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        ));
-        // Adding request to request queue
-        queue.add(request);
+
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            // TODO Auto-generated method stub
+            super.onProgressUpdate(values);
+            progressBar.setProgress(values[0]);
+            // 背景工作處理"中"更新的事
+
+        }
 
     }
 
-    private void faceDetect(String m, final String n) {
-        Log.d("face","detect");
-        if (m != null) {
-            if (m.indexOf("yes") != -1) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this, R.style.MyDialogTheme);
-                dialog.setMessage("哈囉" + n + "？");
-                dialog.setTitle("辨識成功");
-                dialog.setPositiveButton("確定", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        closeCamera();
-                        Intent intent = new Intent(MainActivity.this, Home.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString("name",n);
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                        MainActivity.this.finish();
-                    }
-                });
-                dialog.setNegativeButton("不是", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(MainActivity.this, "請再拍一次", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                dialog.show();
-            } else if (m.indexOf("no") != -1) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this, R.style.MyDialogTheme);
-                dialog.setMessage("Zenbo辨識不出你的身分，請問是初次使用嗎？");
-                dialog.setTitle("辨識失敗");
-                dialog.setPositiveButton("初次使用", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        closeCamera();
-                        Intent intent = new Intent(MainActivity.this, FirstUse.class);
-                        startActivity(intent);
-                        MainActivity.this.finish();
-                    }
-                });
-                dialog.setNegativeButton("再試一次", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(MainActivity.this, "請再拍一次", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                dialog.show();
+    private void initDialog() {
+        dialogView = View.inflate(MainActivity.this, R.layout.login, null);
+        dialog = new Dialog(MainActivity.this, R.style.MyAlertDialogStyle);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(dialogView);
+        cancel = dialog.findViewById(R.id.cancel);
+        progressBar = dialog.findViewById(R.id.progressBar);
+        enter = dialog.findViewById(R.id.enter);
+        waiting = dialog.findViewById(R.id.waiting);
+        title = dialog.findViewById(R.id.title);
+        subtitle = dialog.findViewById(R.id.subtitle);
+
+        cancel.setVisibility(View.INVISIBLE);
+        enter.setVisibility(View.INVISIBLE);
+        title.setVisibility(View.INVISIBLE);
+        subtitle.setVisibility(View.INVISIBLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+    }
+
+    private void updateDialog(String success, String name) {
+        progressBar.setVisibility(View.INVISIBLE);
+        waiting.setVisibility(View.INVISIBLE);
+        enter.setVisibility(View.VISIBLE);
+        cancel.setVisibility(View.VISIBLE);
+        title.setVisibility(View.VISIBLE);
+        subtitle.setVisibility(View.VISIBLE);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "請再拍一次", Toast.LENGTH_SHORT).show();
+                dialog.cancel();
             }
+        });
+
+        if (success.indexOf("yes") != -1) {
+            title.setText("辨識成功");
+            subtitle.setText("哈囉，" + name + "？");
+            cancel.setText("不是");
+            enter.setText("沒錯");
+            enter.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    closeCamera();
+                    Intent intent = new Intent(MainActivity.this, Home.class);
+                    startActivity(intent);
+                    MainActivity.this.finish();
+                }
+            });
+        } else {
+            title.setText("辨識失敗");
+            subtitle.setText("可能系統未正確辨識出你的臉部，或尚未有此臉部的資料");
+            cancel.setText("再拍一次");
+            enter.setText("初次使用");
+            enter.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    closeCamera();
+                    Intent intent = new Intent(MainActivity.this, FirstUse.class);
+                    startActivity(intent);
+                    MainActivity.this.finish();
+                }
+            });
         }
     }
-
-    private void showpDialog() {
-        if (!pDialog.isShowing())
-            pDialog.show();
-    }
-
-    private void hidepDialog() {
-        if (pDialog.isShowing())
-            pDialog.dismiss();
-    }
-
-
 }

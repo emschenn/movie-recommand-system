@@ -3,7 +3,7 @@ $(document).ready(function() {
     $.ajax({
         async: true,
         crossDomain: true,
-        url: "http://192.168.210.10:8000/test/",
+        url: "http://192.168.210.22:8000/test/",
         method: "GET",
         dataType: "json",
         success: function(data) {

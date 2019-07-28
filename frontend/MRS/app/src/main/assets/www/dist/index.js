@@ -52,7 +52,7 @@ $("#m-cat").click(function() {
 $("#m-emo").click(function() {
     $.ajax({
         type: 'get',
-        url: "http://192.168.210.10:8000/test/",
+        url: "http://192.168.210.22:8000/test/",
         dataType: "json",
         success: function(data) {
             console.log(data);
@@ -103,7 +103,7 @@ $("#m-rate").click(function() {
 
     $("#rated").empty();
     $.ajax({
-        url: "http://192.168.210.10:8000/get_movie_rating/",
+        url: "http://192.168.210.22:8000/get_movie_rating/",
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(json),
@@ -139,7 +139,7 @@ $("#m-list").click(function() {
     json['name'] = localStorage.getItem('name');
     $("#unwatch").empty();
     $.ajax({
-        url: "http://192.168.210.10:8000/get_favorite/",
+        url: "http://192.168.210.22:8000/get_favorite/",
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(json),
