@@ -99,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     int time = 0;
     private static final String TAG = "AndroidCameraApi";
-    private String SERVER_URL = "http://192.168.210.22:8000/post/";
+    GlobalVariable gv = (GlobalVariable)getApplicationContext();
+    private String SERVER_URL;
     private Button takePictureButton;
     private TextureView textureView;
     private TextView mainTitle, mainSubtitle;
@@ -149,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SERVER_URL = gv.getURL();
         this.mRobotAPI = new RobotAPI(getApplicationContext(), robotCallback);
         //    mRobotAPI.robot.speak("第二張");
         mRobotAPI.robot.setTouchOnlySignal(true);

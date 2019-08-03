@@ -30,7 +30,7 @@ $(".button").click(function() {
         $(".loader").addClass("active");
 
         $.ajax({
-            url: "http://192.168.210.22:8000/new_user_list/",
+            url: SERVER_URL + "new_user_list/",
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(json),

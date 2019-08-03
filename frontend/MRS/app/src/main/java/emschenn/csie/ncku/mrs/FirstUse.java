@@ -94,7 +94,8 @@ public class FirstUse extends AppCompatActivity {
     private ProgressDialog pDialog;
     int time = 0;
     private static final String TAG = "AndroidCameraApi";
-    private String SERVER_URL = "http://192.168.210.22:8000/add/";
+    GlobalVariable gv = (GlobalVariable)getApplicationContext();
+    private String SERVER_URL;
     private Button takePictureButton;
     private TextureView textureView;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -141,6 +142,7 @@ public class FirstUse extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first_use);
+        SERVER_URL = gv.getURL();
 
         this.mRobotAPI = new RobotAPI(getApplicationContext(), robotCallback);
         //    mRobotAPI.robot.speak("第二張");
@@ -481,23 +483,28 @@ public class FirstUse extends AppCompatActivity {
                     int offset = 0;
                     int buflen = input.length / 100;
                     while (i < 100) {
-                        publishProgress(i);
+                        publishProgress(i/10);
                         os.write(input, offset, buflen);
                         offset += buflen;
                         i++;
                     }
                     os.write(input, offset, input.length % 100);
-                    publishProgress(100);
+                    publishProgress(10);
                     //os.write(input, 0, input.length);
                 }
                 try (BufferedReader br = new BufferedReader(
                         new InputStreamReader(con.getInputStream(), "utf-8"))) {
                     StringBuilder response = new StringBuilder();
                     String responseLine = null;
+                    int i=0;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
+                        i++;
+                        if ((i % 200) == 0)
+                            publishProgress(i / 200);
                     }
                     System.out.println(response.toString());
+                    publishProgress(100);
                     jsonString1 = response.toString();
                 }
             } catch (Exception e) {
