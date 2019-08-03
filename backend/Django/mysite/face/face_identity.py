@@ -33,7 +33,7 @@ attributes = 'gender,age,emotion'
 
 TIME_SLEEP = 10
 
-model = keras.models.load_model('face/my_model.h5')
+# model = keras.models.load_model('face/my_model.h5')
 global graph
 graph = tf.get_default_graph()
 
