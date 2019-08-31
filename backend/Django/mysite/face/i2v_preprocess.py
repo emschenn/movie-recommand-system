@@ -5,109 +5,106 @@ import numpy as np
 import ast
 import math
 import csv
+import random
 from collections import defaultdict
+import pickle
 
 
-movie = pd.read_csv("../../../movie_data/MovieLens/ml-latest-small/movies.csv",sep=",")
-m_dict = dict()
-title_dict = dict()
+movie_dict = pd.read_csv("user_rating_last.csv",sep=",")
+movie_dict['rating'] = movie_dict['rating'].map(ast.literal_eval)
+movie_dict = movie_dict.set_index('userId').T.to_dict('list')
 
-user =  pd.read_csv("../../../movie_data/MovieLens/ml-latest-small/ratings.csv",sep=",")
-user_dict = defaultdict(list)
+file = open('item_idx_dict.pickle', 'rb')
+item_idx_dict =pickle.load(file)
+file.close()
+file = open('idx_item_dict.pickle', 'rb')
+idx_item_dict =pickle.load(file)
+file.close()
+# print(item_idx_dict)
+# print(idx_item_dict)
 
-df = pd.read_csv("mycsvfile.csv",sep=",")
+file = open('positive_train2.pickle', 'ab')
+file2 = open('negative_train2.pickle', 'ab')
+file_test = open('positive_test2.pickle', 'ab')
+file2_test = open('negative_test2.pickle', 'ab')
+
 imdb_id = pd.read_csv("../../../movie_data/MovieLens/ml-latest-small/links.csv",sep=",")
-df['movieId'] = df['movieId'].map(ast.literal_eval)
-movie_dict = df.set_index('topic').T.to_dict('list')
-
-
 def movieId_link(id):
-    topic = imdb_id.loc[imdb_id['movieId'] == id]
+  
+    topic = imdb_id.loc[imdb_id['tmdbId'] == id]
+    print(id)
+    print('idididdididi', topic['movieId'].values)
+    print('idididdididi', topic['movieId'].values[0])
+    if(topic['movieId'].values[0] != None):
+        return topic['movieId'].values[0]
 
-    # print('idididdididi', topic['tmdbId'].values)
-    if(topic['tmdbId'].values != None):
-        if(math.isnan(float(''.join(str(i) for i in topic['tmdbId'].values))) == False):
-            return int(float(''.join(str(i) for i in topic['tmdbId'].values)))
-
-def name_to_id():
-    for index, i in movie.iterrows():
-        #print(i)
-        id = movie.loc[index, 'movieId']
-        tmdb = movieId_link(id)
-        # print(id)
-        title = movie.loc[index, 'title']
-        # print(title)
-        if(tmdb != math.nan):
-            # m_dict[title] = tmdb
-            title_dict[tmdb] = title
-   
-    #建檔
-    # with open('name_to_id.csv', 'w', encoding = 'utf8', newline='') as f:  # Just use 'w' mode in 3.x
-    #     w = csv.writer(f)
-    #     for key, val in m_dict.items():
-    #         w.writerow([key, val])
-    # 建檔
-    # with open('id_to_name.csv', 'w', encoding = 'utf8', newline='') as f:  # Just use 'w' mode in 3.x
-    #     w = csv.writer(f)
-    #     for key, val in title_dict.items():
-    #         w.writerow([key, val])
-
-def user_set():
-    length = 0
-    for index, i in user.iterrows():
-        id = user.loc[index, 'userId']
-        # print(id)
-        mId = user.loc[index, 'movieId']
-        tmdb = movieId_link(mId)
-        # print(title)
-        if(tmdb != math.nan):
-            user_dict[id].append(title_dict[tmdb])
-            length += 1
-    
-    user_dict['<unk>'].append(length)
-    # with open('usre_set.csv', 'w', encoding = 'utf8', newline='') as f:  # Just use 'w' mode in 3.x
-    #     w = csv.writer(f)
-    #     for key, val in user_dict.items():
-    #         w.writerow([key, val])
-    with open('user_set_movie_name.csv', 'w', encoding = 'utf8', newline='') as f:  # Just use 'w' mode in 3.x
-        w = csv.writer(f)
-        for key, val in user_dict.items():
-            w.writerow([key, val])
-
-def shuffle(reader, buf_size):
-    """
-    Creates a data reader whose data output is shuffled.
-
-    Output from the iterator that created by original reader will be
-    buffered into shuffle buffer, and then shuffled. The size of shuffle buffer
-    is determined by argument buf_size.
-
-    :param reader: the original reader whose output will be shuffled.
-    :type reader: callable
-    :param buf_size: shuffle buffer size.
-    :type buf_size: int
-
-    :return: the new reader whose output is shuffled.
-    :rtype: callable
-    """
-    import random
-    def data_reader():
-        buf = []
-        for e in reader():
-            buf.append(e)
-            if len(buf) >= buf_size:
-                random.shuffle(buf)
-                for b in buf:
-                    yield b
-                buf = []
-
-        if len(buf) > 0:
-            random.shuffle(buf)
-            for b in buf:
-                yield b
-
-    return data_reader
 
 if __name__ == '__main__':
-    name_to_id()
-    user_set()
+    vocabulary_size = len(item_idx_dict)
+    # print(vocabulary_size)
+    for i in range(len(movie_dict)):
+        old_user = movie_dict[i + 1][0]
+        # print(old_user_1)
+        # old_rating = list()
+        # if i == 0:
+        #     print(old_user)
+        user_dict = []
+        for movieId, rating in old_user.items():
+            if movieId != None:
+                print(movieId, item_idx_dict.get(movieId_link(movieId)))
+                user_dict.append(item_idx_dict.get(movieId_link(movieId), item_idx_dict['unk']))
+        # if i == 0:
+        #     print(user_dict)
+        for k in range(len(user_dict)):
+            target = user_dict[k]
+            # generate positive sample
+            context_list = []
+            negative_list = []
+            j = k - 2
+            while j <= k + 2 and j < len(user_dict) -3:
+                if j >= 0 and j != k:
+                    context_list.append(user_dict[j])
+                j += 1
+            for con in context_list:
+                pickle.dump(((target, con), 1), file)
+            # if i == 0:
+            #     for con in context_list:
+            #         print((target, con), 1)
+            # generate negative sample
+            for _ in range(len(context_list)):
+                ne_idx = random.randrange(0, vocabulary_size)
+                while ne_idx in context_list:
+                    ne_idx = random.randrange(0, vocabulary_size)
+                negative_list.append(ne_idx)
+            for con in negative_list:
+                pickle.dump(((target, con), 0), file2)
+            
+            # train
+            # ==========================================
+            # test
+            context_list = []
+            negative_list = []
+
+            while j <= k + 2 and j < len(user_dict):
+                if j >= 0 and j != k:
+                    context_list.append(user_dict[j])
+                j += 1
+            for con in context_list:
+                pickle.dump(((target, con), 1), file_test)
+            # if i == 0:
+            #     for con in context_list:
+            #         print((target, con), 1)
+            # generate negative sample
+            for _ in range(len(context_list)):
+                ne_idx = random.randrange(0, vocabulary_size)
+                while ne_idx in context_list:
+                    ne_idx = random.randrange(0, vocabulary_size)
+                negative_list.append(ne_idx)
+            for con in negative_list:
+                pickle.dump(((target, con), 0), file2_test)
+            # if i == 0:
+            #     for con in negative_list:
+            #         print((target, con), 0)
+        # print(i, '===============')
+    
+    # print(user_dict)

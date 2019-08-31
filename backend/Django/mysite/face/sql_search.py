@@ -39,55 +39,45 @@ def user_search(target):
    db.close()
 
 def movie_list_search(target):
-    # 打开数据库连接
    db  =  pymysql.connect ( host = '127.0.0.1' ,  user = 'root' ,  passwd = "" ,  db = 'test' )
-   
-   # 使用cursor()方法获取操作游标 
    cursor = db.cursor()
 
    print('name ', target)
    
-   # SQL 查询语句
+  
    sql = "SELECT * FROM movie WHERE user_name = %s"
 
    movie = None
    try:
-      # 执行SQL语句
       cursor.execute(sql, target)
-      # 获取所有记录列表
       results = cursor.fetchall()
       for row in results:
          movie = row[1]
-         # 打印结果
+         
          print ("movie=%s " % \
                (movie))
    except:
       print ("Error: unable to fetch data")
    
-   # 关闭数据库连接
+   
    db.close()
 
 def movie_update(target):
-   # 打开数据库连接
    db  =  pymysql.connect ( host = '127.0.0.1' ,  user = 'root' ,  passwd = "" ,  db = 'test' )
-   
-   # 使用cursor()方法获取操作游标 
    cursor = db.cursor()
 
    print('name ', target)
    
-   # SQL 查询语句
    sql = "SELECT * FROM movie WHERE user_name = %s"
    
    movie = list()
    try:
-      # 执行SQL语句
       cursor.execute(sql, target)
-      # 获取所有记录列表
+      
       results = cursor.fetchall()
       for row in results:
          movie = row[1]
-         # 打印结果
+         
          print ("movie=%s " % \
                (movie))
    except:
@@ -102,9 +92,7 @@ def movie_update(target):
    sql_update = "UPDATE movie SET watched_movie_id='" + str1 + "' WHERE user_name='" + target + "'"
   
    try:
-      # 执行SQL语句
       cursor.execute(sql_update)
-      # 提交到数据库执行
       db.commit()
    except Exception as e:
       print(e)
@@ -112,7 +100,7 @@ def movie_update(target):
 
 
    
-   # 关闭数据库连接
+   
    db.close()
 
 # 修bug用 只增加一個評分
@@ -296,11 +284,37 @@ def rating_update(target, tmdbId, rating):
    except:
       print ("Error: unable to fetch data")
 
-   #movie
-   print(tmdbId)
+   # string to list
    movie_list = list()
+   rating_list = list()
+   tmdbId_list = list()
+   tmdbId_rating_list = list()
    if len(movie) != 0:
       movie_list = movie.split(',')
+   if len(ratings) != 0:
+      rating_list = ratings.split(',')
+   tmdbId_list = tmdbId.split(',')
+   tmdbId_rating_list = rating.split(',')
+
+   
+   print(len(movie_list))
+   print(len(rating_list))
+
+   print(movie_list)
+   print(rating_list)
+   
+   for tmp in tmdbId_list:
+      if tmp in movie_list:
+         print(movie_list.index(tmp))
+         pair = movie_list.index(tmp)
+         del movie_list[pair]
+         del rating_list[pair]
+         print(movie_list)
+         print(rating_list)
+  
+
+
+   
    # for tmp in tmdbId:
    movie_list.append(tmdbId)
    print('movie ', movie_list)
@@ -308,9 +322,7 @@ def rating_update(target, tmdbId, rating):
    print(str1)
 
    #rating
-   rating_list = list()
-   if len(ratings) != 0:
-      rating_list = ratings.split(',')
+  
    # for tmp in rating:
    rating_list.append(rating)
    print('rating', rating_list)
@@ -337,26 +349,26 @@ def rating_update(target, tmdbId, rating):
    db.close()
 
 def favorite_update(target, tmdbId):
-   # 打开数据库连接
    db  =  pymysql.connect ( host = '127.0.0.1' ,  user = 'root' ,  passwd = "" ,  db = 'test' )
-   
-   # 使用cursor()方法获取操作游标 
    cursor = db.cursor()
 
    print('name ', target)
+
+   repeat_insert = movie_exists(target, tmdbId)
+   if repeat_insert == 1:
+      db.close()
+      return
    
-   # SQL 查询语句
    sql = "SELECT * FROM movie WHERE user_name = %s"
    
    favorite = list()
    try:
-      # 执行SQL语句
       cursor.execute(sql, target)
-      # 获取所有记录列表
+      
       results = cursor.fetchall()
       for row in results:
          favorite = row[3]
-         # 打印结果
+         
          print ("movie=%s " % \
                (favorite))
    except:
@@ -392,26 +404,20 @@ def favorite_update(target, tmdbId):
    db.close()
 
 def get_favorite(target):
-      # 打开数据库连接
    db  =  pymysql.connect ( host = '127.0.0.1' ,  user = 'root' ,  passwd = "" ,  db = 'test' )
-   
-   # 使用cursor()方法获取操作游标 
    cursor = db.cursor()
 
    print('name ', target)
    
-   # SQL 查询语句
    sql = "SELECT * FROM movie WHERE user_name = %s"
    
    favorite = list()
    try:
-      # 执行SQL语句
       cursor.execute(sql, target)
-      # 获取所有记录列表
       results = cursor.fetchall()
       for row in results:
          favorite = row[3]
-         # 打印结果
+         
          print ("movie=%s " % \
                (favorite))
    except:
@@ -618,164 +624,51 @@ def clear_column(target, col):
       db.rollback()
 
 
-'''
-
-def happiness_movie(num):
-    # 打开数据库连接
+def movie_exists(target, tmdbId):
    db  =  pymysql.connect ( host = '127.0.0.1' ,  user = 'root' ,  passwd = "" ,  db = 'test' )
-   
-   # 使用cursor()方法获取操作游标 
    cursor = db.cursor()
-   
-   # SQL 查询语句
-   sql = "SELECT happiness FROM movie"
 
+   # 1:exist 0:not exists 
+   result = 0
+
+   sql = "SELECT * FROM movie WHERE user_name = %s"
+   
+   favorite = list()
    try:
-      # 执行SQL语句
-      cursor.execute(sql)
-      # 获取所有记录列表
+      cursor.execute(sql, target)
       results = cursor.fetchall()
-      print (num)
-      
-      for row in results[num]:
-         happiness = row
-        
-         # 打印结果
-         print ("happiness=%s " % \
-               (happiness ))
-      
+      for row in results:
+         favorite = row[3]
+         
+         print ("movie=%s " % \
+               (favorite))
    except:
       print ("Error: unable to fetch data")
 
-def anger_movie(num):
-    # 打开数据库连接
-   db  =  pymysql.connect ( host = '127.0.0.1' ,  user = 'root' ,  passwd = "" ,  db = 'test' )
+   favorite_list = list()
+   if len(favorite) != 0:
+      favorite_list = favorite.split(',')
    
-   # 使用cursor()方法获取操作游标 
-   cursor = db.cursor()
-   
-   # SQL 查询语句
-   sql = "SELECT anger FROM movie"
+   if str(tmdbId) in favorite_list:
+      result = 1
+   else:
+      result = 0
 
-   try:
-      # 执行SQL语句
-      cursor.execute(sql)
-      # 获取所有记录列表
-      results = cursor.fetchall()
-      print (num)
-      
-      for row in results[num]:
-         anger = row
-        
-         # 打印结果
-         print ("anger=%s " % \
-               (anger ))
-      
-   except:
-      print ("Error: unable to fetch data")
 
-def neutral_movie(num):
-    # 打开数据库连接
-   db  =  pymysql.connect ( host = '127.0.0.1' ,  user = 'root' ,  passwd = "" ,  db = 'test' )
-   
-   # 使用cursor()方法获取操作游标 
-   cursor = db.cursor()
-   
-   # SQL 查询语句
-   sql = "SELECT neutral FROM movie"
-
-   try:
-      # 执行SQL语句
-      cursor.execute(sql)
-      # 获取所有记录列表
-      results = cursor.fetchall()
-      print (num)
-      
-      for row in results[num]:
-         neutral = row
-        
-         # 打印结果
-         print ("neutral=%s " % \
-               (neutral ))
-      
-   except:
-      print ("Error: unable to fetch data")
-
-def fear_movie(num):
-    # 打开数据库连接
-   db  =  pymysql.connect ( host = '127.0.0.1' ,  user = 'root' ,  passwd = "" ,  db = 'test' )
-   
-   # 使用cursor()方法获取操作游标 
-   cursor = db.cursor()
-   
-   # SQL 查询语句
-   sql = "SELECT fear FROM movie"
-
-   try:
-      # 执行SQL语句
-      cursor.execute(sql)
-      # 获取所有记录列表
-      results = cursor.fetchall()
-      print (num)
-      
-      for row in results[num]:
-         fear = row
-        
-         # 打印结果
-         print ("fear=%s " % \
-               (fear ))
-      
-   except:
-      print ("Error: unable to fetch data")
-
-def new_insert(name, topic, id):
-   # 打开数据库连接
-   db  =  pymysql.connect ( host = '127.0.0.1' ,  user = 'root' ,  passwd = "" ,  db = 'test' )
-   
-   rating = list()
-   for tmp in id:
-      rating.append(5)
-
-   str1 = ','.join(str(e) for e in rating)
-   str2 = ','.join(str(e) for e in id)
-   str3 = ','.join(str(e) for e in topic)
-   
-   
-   # 使用cursor()方法获取操作游标 
-   cursor = db.cursor()
-
-   print('insert name   ' + name)
-   
-   # SQL 插入语句
-   #movie_info
-   
-   sql = """INSERT INTO movie(user_name, watched_movie_id, rating)
-            VALUES (name, '1,50,97', '2,3,5', 'sth.')"""
-   
-   sql = "INSERT INTO movie(`user_name`, `watched_movie_id`, `rating`, `favorite`, `like_topic`) VALUES (%s, %s, %s, %s, %s)"
-
-   try:
-      # 执行sql语句
-      cursor.execute(sql, (name, str2, str1, 'NULL', str3))
-      # 提交到数据库执行
-      db.commit()
-   except Exception as e:
-      # 如果发生错误则回滚
-      print(e)
-      db.rollback()
-   
-   # 关闭数据库连接
    db.close()
+   return result
 
-'''
+
 
 if __name__=='__main__':
+   # movie_exists('Elmo', 777)
+   # favorite_update('Elmo', 862)
    # movie_update('jh1g')
-   update_bpr('1234', 0)
+   # update_bpr('1234', 0)
    # get_bpr('1234')
-   # clear_column('1234', 'watched_movie_id')
-   # clear_column('1234', 'rating')
-   # rating_update('1234', '287947,329996,429617', '4, 5, 3')
+   # clear_column('Elmo', 'watched_movie_id')
+   # clear_column('Elmo', 'rating')
+   rating_update('emschen', '862,949,710,687,9598', '3,4,5,4,5')
    # rating_update_test('1234')
    # movie, rating = get_movie_rating('1234')
    # md = dict()

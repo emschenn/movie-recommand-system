@@ -73,7 +73,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 #                 w.writerow([key, val])
 
 # cosine similarity 
-user_rating_matrix = pd.read_csv("face/user_rating_last.csv",sep=",")
+user_rating_matrix = pd.read_csv("face/util_data/user_rating_last.csv",sep=",")
 user_rating_matrix['rating'] = user_rating_matrix['rating'].map(ast.literal_eval)
 movie_dict = user_rating_matrix.set_index('userId').T.to_dict('list')
 def similitary(new_user):

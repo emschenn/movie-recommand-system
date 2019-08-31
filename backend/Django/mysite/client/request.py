@@ -19,11 +19,11 @@ headers = {'content-type': 'application/json'}
 # r = requests.post(url, data=json.dumps(data), headers=headers)
 url = 'http://127.0.0.1:8000/post/'
 # with open('../temp2.jpg', "rb") as imageFile:
-#     str1 = base64.b64encode(imageFile.read()).decode("utf-8")
-with open('../../../image/tmp_5.jpg', "rb") as imageFile:
+    # str1 = base64.b64encode(imageFile.read()).decode("utf-8")
+with open('../../../image/tmp_1.jpg', "rb") as imageFile:
     str1 = base64.b64encode(imageFile.read()).decode("utf-8")
 data = ({'img':str1})
-r = requests.post(url, data=json.dumps(data), headers=headers)
+# r = requests.post(url, data=json.dumps(data), headers=headers)
 files={'pic1':('test.png',open('../../../image/tmp_1.jpg','rb'),'image/png')}
 # r = requests.post(url, data=json.dumps(data), headers=headers)
 url = 'http://127.0.0.1:8000/add/'
@@ -55,7 +55,7 @@ headers = {'content-type': 'application/json'}
 # r = requests.post(url, data=json.dumps(data), headers=headers)
 
 url = 'http://127.0.0.1:8000/update_favorite/'
-data = ({'name': '1234', 'tmdbId': '777'})
+data = ({'name': 'Elmo', 'tmdbId': '777'})
 headers = {'content-type': 'application/json'}
 # r = requests.post(url, data=json.dumps(data), headers=headers)
 
@@ -70,10 +70,14 @@ headers = {'content-type': 'application/json'}
 # r = requests.post(url, data=json.dumps(data), headers=headers)
 
 url = 'http://127.0.0.1:8000/get_movie_rating/'
-data = ({'name': '1234'})
+data = ({'name': 'emschen'})
 headers = {'content-type': 'application/json'}
 # r = requests.post(url, data=json.dumps(data), headers=headers)
 
+url = 'http://127.0.0.1:8000/post_i2vId/'
+data = ({'id': 398818})
+headers = {'content-type': 'application/json'}
+r = requests.post(url, data=json.dumps(data), headers=headers)
 
 
 #r.json()

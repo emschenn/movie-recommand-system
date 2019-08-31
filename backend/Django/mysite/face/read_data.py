@@ -4,6 +4,7 @@ import ast
 import math
 import numpy as np
 import keras
+import pickle
 
 
 
@@ -170,11 +171,30 @@ def choose_movie_by_data(user_id):
     print("recommadation")
     return tmdbId
 
+def id_to_name():
+    mdict = dict()
+    movie = pd.read_csv("name_to_id.csv",sep=",")
+    print(movie[movie['862'].isnull()])
+    movie = movie.dropna(subset=['862'])
+    movie['862'] = movie['862'].astype(int)
+    print('-----')
+    for id, name in movie.iterrows():
+        # print(name['862'], name['Toy Story (1995)'])
+        # if math.isnan(int(name['862'])):
+            # print(int(name['862']))
+        mdict[name['862']] = name['Toy Story (1995)']
+    mdict[862] = 'Toy Story (1995)'
+    # print(mdict)
+    file = open('id_to_name.pickle', 'wb')
+    pickle.dump(mdict, file)
+    file.close()
+
    
 
 
 if __name__ == "__main__":
     #i = choose_movie_by_emotion()
     #print('i', i)
-    i = choose_movie_by_data(5)
-    print(i)
+    # i = choose_movie_by_data(5)
+    # print(i)
+    id_to_name()

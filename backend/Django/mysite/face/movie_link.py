@@ -4,7 +4,7 @@ import ast
 import sys
 
 
-df = pd.read_csv("face/mycsvfile.csv",sep=",")
+df = pd.read_csv("face/util_data/mycsvfile.csv",sep=",")
 imdb_id = pd.read_csv("../../movie_data/MovieLens/ml-latest-small/links.csv",sep=",")
 
 df['movieId'] = df['movieId'].map(ast.literal_eval)
@@ -19,7 +19,7 @@ i = float(''.join(str(i) for i in topic['tmdbId'].values))
 
 
 def movieId_link(id):
-    df = pd.read_csv("face/mycsvfile.csv",sep=",")
+    df = pd.read_csv("face/util_data/mycsvfile.csv",sep=",")
     imdb_id = pd.read_csv("../../movie_data/MovieLens/ml-latest-small/links.csv",sep=",")
 
     df['movieId'] = df['movieId'].map(ast.literal_eval)

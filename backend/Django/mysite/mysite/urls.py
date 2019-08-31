@@ -33,6 +33,7 @@ urlpatterns = [
     path('get_favorite/', get_favorite),
     path('remove_favorite/', remove_favorite),
     path('get_movie_rating/', get_movie_rating),
+    path('post_i2vId/', post_i2vId),
 ]
 
 

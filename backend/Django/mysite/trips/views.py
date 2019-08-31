@@ -13,6 +13,7 @@ from face import face_identity
 from face import face_confirm
 from face import sql_insert
 from face import sql_search
+from face import item2vec_model
 
 
 
@@ -96,7 +97,7 @@ def img_post(request):
                     return JsonResponse({'success' : 'no', 'name' : 'stranger'})
                 #如果不是
                 else:
-                    return JsonResponse({'success' : 'yes', 'name' : str(ans), 'happiness' : str(happiness), 'anger' : str(anger), 'neutral' : str(neutral), 'fear' : str(fear), 'contempt' : str(contempt), 'disgust' : str(disgust), 'sadness' : str(sadness), 'surprise' : str(surprise), 'movie' : str(tmdbId), 'recommandation': str(recommendation)})
+                    return JsonResponse({'success' : 'yes', 'name' : str(ans), 'happiness' : str(happiness), 'anger' : str(anger), 'neutral' : str(neutral), 'fear' : str(fear), 'contempt' : str(contempt), 'disgust' : str(disgust), 'sadness' : str(sadness), 'surprise' : str(surprise), 'movie' : str(tmdbId), 'recommandation': recommendation})
     return JsonResponse({'success' : 'no', 'name' : ''})
 '''
 def img_post(request):
@@ -150,7 +151,8 @@ def face_post(request):
                     return JsonResponse({'success' : 'no', 'name' : 'stranger'})
                 #如果不是
                 else:
-                    return HttpResponse(json.dumps(qqq), content_type='application/json')
+                    # return HttpResponse(json.dumps(qqq), content_type='application/json')
+                    return JsonResponse({'success' : 'yes', 'name' : str(ans), 'happiness' : str(happiness), 'anger' : str(anger), 'neutral' : str(neutral), 'fear' : str(fear), 'contempt' : str(contempt), 'disgust' : str(disgust), 'sadness' : str(sadness), 'surprise' : str(surprise), 'movie' : str(imdbId)})
     print('get not post')
     return JsonResponse({'success' : 'no', 'name' : ''})
 
@@ -221,6 +223,7 @@ def user_seach(request):
 
     return JsonResponse({'success' : 'yes', 'name' : ''})
 
+# 主頁
 def test_req(request):
     global ans
     global happiness
@@ -265,8 +268,8 @@ def test_req(request):
                 #myarray = ' '.join(tmdbId)
                 print('tmdbId ', tmdbId)
                 print('recommendation ', recommendation)
-                qqq = [{'success' : 'yes', 'name' : str(ans), 'happiness' : str(happiness), 'anger' : str(anger), 'neutral' : str(neutral), 'fear' : str(fear), 'contempt' : str(contempt), 'disgust' : str(disgust), 'sadness' : str(sadness), 'surprise' : str(surprise), 'movie1' : str(tmdbId[0]), 'movie2' : str(tmdbId[1]), 'movie3' : str(tmdbId[2]), 'recommandation1': str(recommendation[0]),
-                'recommandation2': str(recommendation[1]), 'recommandation3': str(recommendation[2]), 'recommandation4': str(recommendation[3]), 'recommandation5': str(recommendation[4])}]
+                qqq = [{'success' : 'yes', 'name' : str(ans), 'happiness' : str(happiness), 'anger' : str(anger), 'neutral' : str(neutral), 'fear' : str(fear), 'contempt' : str(contempt), 'disgust' : str(disgust), 'sadness' : str(sadness), 'surprise' : str(surprise), 'movie' : tmdbId, 'recommandation': recommendation}]
+
 
                             
                 #如果是陌生人
@@ -274,7 +277,8 @@ def test_req(request):
                     return JsonResponse({'success' : 'no', 'name' : 'stranger'})
                 #如果不是
                 else:
-                    return HttpResponse(json.dumps(qqq), content_type='application/json')
+                    # return HttpResponse(json.dumps(qqq), content_type='application/json')
+                    return JsonResponse({'success' : 'yes', 'name' : str(ans), 'happiness' : str(happiness), 'anger' : str(anger), 'neutral' : str(neutral), 'fear' : str(fear), 'contempt' : str(contempt), 'disgust' : str(disgust), 'sadness' : str(sadness), 'surprise' : str(surprise), 'movie' : tmdbId, 'recommandation': recommendation})
     return JsonResponse({'success' : 'no', 'name' : ''})
     
     #qqq = [{'success' : 'yes', 'name' : str(ans), 'happiness' : str(happiness), 'anger' : str(anger), 'neutral' : str(neutral), 'fear' : str(fear), 'contempt' : str(contempt), 'disgust' : str(disgust), 'sadness' : str(sadness), 'surprise' : str(surprise), 'movie' : str(tmdbId)}]
@@ -310,6 +314,7 @@ def update_favorite(request):
 
     return JsonResponse({'success' : 'update_favorite'})
 
+# 重複檢查
 def get_favorite(request):
     if request.method=='POST':
         received_json_data=json.loads(request.body)
@@ -336,3 +341,15 @@ def get_movie_rating(request):
         #     new[movie[index]] = rating[index]
 
     return JsonResponse({'tmdbId' : movie, 'rating' : rating})
+
+# item2vector model
+def post_i2vId(request):
+    if request.method=='POST':
+        received_json_data=json.loads(request.body)
+        print(str(received_json_data))
+        nearests = item2vec_model.run_sim([received_json_data['id']])
+        print(nearests)
+        # i2v = json.dumps(nearests[0].tolist())
+
+    return JsonResponse({'id' : nearests})
+
