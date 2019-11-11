@@ -96,10 +96,9 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    private ProgressDialog pDialog;
     int time = 0;
     private static final String TAG = "AndroidCameraApi";
-    GlobalVariable gv = (GlobalVariable)getApplicationContext();
+    private GlobalVariable gv;
     private String SERVER_URL;
     private Button takePictureButton;
     private TextureView textureView;
@@ -150,7 +149,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        SERVER_URL = gv.getURL();
+        gv = (GlobalVariable)getApplication();
+        SERVER_URL = gv.postURL();
         this.mRobotAPI = new RobotAPI(getApplicationContext(), robotCallback);
         //    mRobotAPI.robot.speak("第二張");
         mRobotAPI.robot.setTouchOnlySignal(true);
@@ -166,12 +166,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("eee", "ffff");
-                takePicture();
+               takePicture();
+//               closeCamera();
+//                Intent intent = new Intent(MainActivity.this, Home.class);
+//                startActivity(intent);
+//                MainActivity.this.finish();
             }
         });
-        pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Please wait...");
-        pDialog.setCancelable(false);
     }
 
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
@@ -459,8 +460,6 @@ public class MainActivity extends AppCompatActivity {
             super.onPreExecute();
             myHandler = new Handler();
             Log.d("thread", String.valueOf(Thread.currentThread().getId()));
-            //mainSubtitle.setVisibility(View.INVISIBLE);
-            //mainTitle.setVisibility(View.INVISIBLE);
             initDialog();
             dialog.show();
         }
@@ -501,16 +500,23 @@ public class MainActivity extends AppCompatActivity {
                     publishProgress(100);
                     //os.write(input, 0, input.length);
                 }
+                publishProgress(1000);
                 try (BufferedReader br = new BufferedReader(
                         new InputStreamReader(con.getInputStream(), "utf-8"))) {
                     StringBuilder response = new StringBuilder();
                     String responseLine = null;
+                    int i = 0;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
+                        i++;
+                        if ((i % 200) == 0)
+                            publishProgress(i / 200);
                     }
                     System.out.println(response.toString());
                     jsonString1 = response.toString();
                 }
+                publishProgress(100);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return "網路中斷" + e;
@@ -544,6 +550,10 @@ public class MainActivity extends AppCompatActivity {
             super.onProgressUpdate(values);
             progressBar.setProgress(values[0]);
             // 背景工作處理"中"更新的事
+            if(values[0]==1000)
+                progressBar.setIndeterminate(true);
+            else
+                progressBar.setIndeterminate(false);
 
         }
 

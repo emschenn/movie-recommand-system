@@ -3,10 +3,7 @@ var isinlist = 0;
 function moreInfo(id, added, rated) {
     $('.modal').toggleClass('is-visible');
     $(".tooltiptext").hide();
-    $(".modal-rate svg").hide('slow'),
-        function() {
-
-        };
+    $(".modal-rate svg").hide('slow');
     if (added == 1) {
         isinlist = 1;
         $(".m-button span").text("從清單中移除");
@@ -33,7 +30,10 @@ function moreInfo(id, added, rated) {
             d3rate(response.vote_average / 2);
             $(".modal id").text(id);
             $(".modal-header #title").text(response.original_title);
-            $(".modal-header img ").attr("src", "https://image.tmdb.org/t/p/w780/" + response.backdrop_path);
+            if (response.backdrop_path == null)
+                $(".modal-header img ").attr("src", "https://fakeimg.pl/780x439/191919/282828/?&text=no%20img");
+            else
+                $(".modal-header img ").attr("src", "https://image.tmdb.org/t/p/w780/" + response.backdrop_path);
             $(".modal-content #overview").text(response.overview);
             $(".modal-content .modal-info #year").text(response.release_date.slice(0, 4));
             $(".modal-content .modal-info #lang").text(response.original_language);
@@ -50,6 +50,34 @@ function moreInfo(id, added, rated) {
             console.log(response);
 
         },
+    });
+    var json = {};
+    json["id"] = id;
+    console.log(json);
+    /* get word2vec */
+    $.ajax({
+        url: SERVER_URL + "post_i2vId/",
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(json),
+        dataType: 'json',
+        success: function(data) {
+            console.log("success");
+            console.log(data);
+            $(".more").empty();
+            for (i = 0; i < data.id.length; i++) {
+                getmoreinfo(data.id[i]);
+            }
+
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            if (xhr.status == 200) {
+                console.log(ajaxOptions);
+            } else {
+                console.log(xhr.status);
+                console.log(thrownError);
+            }
+        }
     });
 }
 
@@ -89,9 +117,7 @@ $('.m-button').on('click', function(e) {
         $("button").attr("aria-expanded", "false");
     }, 800);
     var json = {};
-    //json["name"] = "1234";
     json['name'] = localStorage.getItem('name');
-
     json["tmdbId"] = id;
     console.log(json);
     if (isinlist == 1) {
@@ -273,7 +299,7 @@ function d3rate(percent) {
     };
 }
 
-// for more info
+/* for more info */
 var container = document.querySelector(".swipe");
 var moreison = false;
 container.addEventListener("touchstart", startTouch, false);
@@ -306,7 +332,6 @@ function moveTouch(e) {
             $(".more").animate({ width: '0vw' }, "slow", function() {
                 $(".swipeimg").show();
                 $(".more").hide();
-
             });
             $(".modal").animate({ left: '0vw' }, "slow");
         } else {
@@ -319,7 +344,7 @@ function moveTouch(e) {
             $(".more").show();
             $(".modal").animate({ left: '10vw' }, "slow");
             $(".more").animate({ width: '22vw' }, "slow");
-            getmoreinfo();
+
         }
         initialX = null;
         initialY = null;
@@ -329,22 +354,29 @@ function moveTouch(e) {
 
 
 
-function getmoreinfo() {
+function getmoreinfo(id) {
     $.ajax({
         async: true,
         crossDomain: true,
-        url: "https://api.themoviedb.org/3/trending/movie/week?api_key=129d4541708a331707bc51ae50d8373c",
+        url: "https://api.themoviedb.org/3/movie/" + id + "?api_key=129d4541708a331707bc51ae50d8373c",
         method: "GET",
         headers: {},
         data: "{}",
         success: function(response) {
             console.log(response);
-            for (i = 0; i < 10; i++) {
-                $(".more").append("<div class='movie' onclick='moreInfo(" + response.results[i].id + ",0,0)'>" +
-                    "<div class='img'> <img src='https://image.tmdb.org/t/p/w154/" + response.results[i].poster_path + "' style='width: 200px;'> </div>" +
-                    "<div class='title'>" + response.results[i].original_title + "</div>" +
+            if (response.poster_path == null) {
+                $(".more").append("<div class='movie' onclick='moreInfo(" + response.id + ",0,0)'>" +
+                    "<div class='img'> <img src='https://fakeimg.pl/200x200/191919/282828/?&text=no%20img'> </div>" +
+                    "<div class='title' style='font-style: normal; transform: scale(1, 1); margin-top: -1.5vh; font-weight: 600;'>" + response.original_title + "</div>" +
+                    "</div>");
+            } else {
+                $(".more").append("<div class='movie' onclick='moreInfo(" + response.id + ",0,0)'>" +
+                    "<div class='img'> <img src='https://image.tmdb.org/t/p/w154/" + response.poster_path + "' style='width: 200px;'> </div>" +
+                    "<div class='title' style='font-style: normal; transform: scale(1, 1); margin-top: -1.5vh; font-weight: 600;'>" + response.original_title + "</div>" +
                     "</div>");
             }
+
         },
     });
+
 }

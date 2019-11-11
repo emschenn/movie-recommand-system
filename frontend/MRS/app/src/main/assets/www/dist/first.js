@@ -1,15 +1,17 @@
 $(document).ready(function() {
-    $(".head").hide();
-    $(".button").hide();
-    $(".input.one").hide();
-    $(".input.two").hide();
-    $(".input.three").hide();
-
+    $(".button").hide(1);
+    $(".input.one").hide(1);
+    $(".input.two").hide(1);
+    $(".input.three").hide(1);
+    $(".head").hide(1);
     $(".head").transition('slide down', 900, function() {
         $(".button").show('slow');
         $(".input.one").show('slow');
 
     });
+
+
+
 });
 
 var input = document.querySelector('input[type="text"]');

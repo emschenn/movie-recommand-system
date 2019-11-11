@@ -91,10 +91,9 @@ public class FirstUse extends AppCompatActivity {
     int num = 1;
     int num2 = 0;
     private ProgressBar step;
-    private ProgressDialog pDialog;
     int time = 0;
     private static final String TAG = "AndroidCameraApi";
-    GlobalVariable gv = (GlobalVariable)getApplicationContext();
+    private GlobalVariable gv;
     private String SERVER_URL;
     private Button takePictureButton;
     private TextureView textureView;
@@ -137,16 +136,18 @@ public class FirstUse extends AppCompatActivity {
     private ProgressBar progressBar;
     private Button cancel, enter;
     private TextView waiting, title, subtitle;
+    private TextView mainTitle, mainSubtitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first_use);
-        SERVER_URL = gv.getURL();
-
+        gv = (GlobalVariable) getApplication();
+        SERVER_URL = gv.addURL();
         this.mRobotAPI = new RobotAPI(getApplicationContext(), robotCallback);
         //    mRobotAPI.robot.speak("第二張");
-
+        mainSubtitle = findViewById(R.id.mainSubtitle);
+        mainTitle = findViewById(R.id.mainTitle);
         textureView = (TextureView) findViewById(R.id.textureView2);
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
@@ -167,9 +168,6 @@ public class FirstUse extends AppCompatActivity {
                 takePicture();
             }
         });
-        pDialog = new ProgressDialog(this);
-        pDialog.setMessage("正在建立資料中");
-        pDialog.setCancelable(false);
     }
 
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
@@ -307,7 +305,8 @@ public class FirstUse extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            textView.setText("請拍攝4張清楚的臉部照片以供辨識：第" + num + "張");
+                            if(num<5)
+                                textView.setText("請拍攝4張清楚的臉部照片以供辨識：第" + num + "張");
                         }
                     });
                     step.incrementProgressBy(25);
@@ -443,15 +442,11 @@ public class FirstUse extends AppCompatActivity {
         private static final int TIME_OUT = 1000;
         String jsonString1 = "";
         private Handler myHandler;
-
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             myHandler = new Handler();
             Log.d("thread", String.valueOf(Thread.currentThread().getId()));
-            //mainSubtitle.setVisibility(View.INVISIBLE);
-            //mainTitle.setVisibility(View.INVISIBLE);
             initDialog();
             dialog.show();
         }
@@ -483,20 +478,21 @@ public class FirstUse extends AppCompatActivity {
                     int offset = 0;
                     int buflen = input.length / 100;
                     while (i < 100) {
-                        publishProgress(i/10);
+                        publishProgress(i);
                         os.write(input, offset, buflen);
                         offset += buflen;
                         i++;
                     }
                     os.write(input, offset, input.length % 100);
-                    publishProgress(10);
+                    publishProgress(100);
                     //os.write(input, 0, input.length);
                 }
+                publishProgress(1000);
                 try (BufferedReader br = new BufferedReader(
                         new InputStreamReader(con.getInputStream(), "utf-8"))) {
                     StringBuilder response = new StringBuilder();
                     String responseLine = null;
-                    int i=0;
+                    int i = 0;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                         i++;
@@ -507,13 +503,13 @@ public class FirstUse extends AppCompatActivity {
                     publishProgress(100);
                     jsonString1 = response.toString();
                 }
+                publishProgress(100);
             } catch (Exception e) {
                 e.printStackTrace();
                 return "網路中斷" + e;
             }
             return jsonString1;
         }
-
 
         public void onPostExecute(String result) {
             super.onPostExecute(result);
@@ -528,7 +524,10 @@ public class FirstUse extends AppCompatActivity {
             super.onProgressUpdate(values);
             progressBar.setProgress(values[0]);
             // 背景工作處理"中"更新的事
-
+            if (values[0] == 1000)
+                progressBar.setIndeterminate(true);
+            else
+                progressBar.setIndeterminate(false);
         }
 
     }

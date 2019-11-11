@@ -23,6 +23,10 @@ $("#m-rec").click(function() {
     showbottom(nowbox);
     $("#rec").animate({ left: '120px' }, "slow");
     $(".rec").animate({ width: '1130px' }, "slow");
+    $("body").animate({ backgroundColor: "#F8F8F8" }, "1000");
+    $(".top").animate({ backgroundColor: "#F8F8F8" }, "1000");
+    $(".top").show();
+
     clearbut("#m-cat");
     clearbut("#m-list");
     clearbut("#m-rate");
@@ -34,8 +38,6 @@ $("#m-cat").click(function() {
     if (cclick == 0) {
         pressbut(this);
         clearbut("#m-emo");
-        clearbut("#m-list");
-        clearbut("#m-rate");
         $("#cat").animate({ left: '80px' }, "slow");
         $("#" + nowbox).animate({ left: '360px' }, "slow");
         $("." + nowbox).animate({ width: '890px' }, "slow");
@@ -50,6 +52,7 @@ $("#m-cat").click(function() {
 });
 
 $("#m-emo").click(function() {
+    $(".hint").hide();
     $.ajax({
         type: 'get',
         url: SERVER_URL + "test/",
@@ -72,8 +75,6 @@ $("#m-emo").click(function() {
     if (eclick == 0) {
         pressbut(this);
         clearbut("#m-cat");
-        clearbut("#m-list");
-        clearbut("#m-rate");
         $("#emo").animate({ left: '80px' }, "slow");
         $("#" + nowbox).animate({ left: '360px' }, "slow");
         $("." + nowbox).animate({ width: '890px' }, "slow");
@@ -90,18 +91,26 @@ $("#m-emo").click(function() {
 $("#m-rate").click(function() {
     nowbox = "rate";
     hidebox();
-    pressbut(this);
+    pressbutblack(this);
     showbottom(nowbox);
     clearbut("#m-cat");
     clearbut("#m-list");
     clearbut("#m-emo");
     $("#" + nowbox).animate({ left: '120px' }, "slow");
     $("." + nowbox).animate({ width: '1130px' }, "slow");
+    $("body").animate({ backgroundColor: "#353535" }, "1000");
+    $(".top").animate({ backgroundColor: "#353535" }, "1000");
+    $(".top").hide();
+
     var json = {};
     //json["name"] = "1234";
     json['name'] = localStorage.getItem('name');
 
-    $("#rated").empty();
+    $(".1-rate").empty();
+    $(".2-rate").empty();
+    $(".3-rate").empty();
+    $(".4-rate").empty();
+    $(".5-rate").empty();
     $.ajax({
         url: SERVER_URL + "get_movie_rating/",
         type: 'POST',
@@ -127,13 +136,18 @@ $("#m-rate").click(function() {
 $("#m-list").click(function() {
     nowbox = "list";
     showbottom(nowbox);
+
     hidebox();
-    pressbut(this);
     clearbut("#m-cat");
     clearbut("#m-emo");
     clearbut("#m-rate");
     $("#" + nowbox).animate({ left: '120px' }, "slow");
     $("." + nowbox).animate({ width: '1130px' }, "slow");
+    pressbutblack(this);
+
+    $("body").animate({ backgroundColor: "#353535" }, "1000");
+    $(".top").animate({ backgroundColor: "#353535" }, "1000");
+    $(".top").hide();
     var json = {};
     // json["name"] = "1234";
     json['name'] = localStorage.getItem('name');
@@ -145,9 +159,10 @@ $("#m-list").click(function() {
         data: JSON.stringify(json),
         dataType: 'json',
         success: function(data) {
+            console.log(data);
+
             for (var i = 0; i < data.success.length; i++) {
                 showWatchList(data.success[i]);
-                console.log(data.success[i]);
             }
         },
         error: function(xhr, ajaxOptions, thrownError) {
@@ -186,6 +201,16 @@ function pressbut(b) {
     }, "1000");
 }
 
+function pressbutblack(b) {
+    $(b).animate({
+        backgroundColor: "#353535",
+        color: "#ffffff",
+        height: 75,
+        width: 20,
+        marginLeft: 30,
+    }, "1000");
+}
+
 function showbottom(n) {
     $("#list").hide();
     $("#rec").hide();
@@ -206,12 +231,20 @@ function searchRequest(searchTitle) {
         data: "{}",
         success: function(response) {
             console.log(response);
-            $('#result .title').text("共 " + response.total_results + " 筆搜尋結果");
+            $('#result .title').text('results for "' + searchTitle + '"');
             for (i = 0; i < response.total_results; i++) {
-                $(".result").append("<div class='col' onclick='moreInfo(" + response.results[i].id + ",0,0)'>" +
-                    "<img src='https://image.tmdb.org/t/p/w154/" + response.results[i].poster_path + "' style='width:145px'>" +
-                    "<p class='mtitle'>" + response.results[i].original_title + "</p>" +
-                    "</div>");
+                if (response.results[i].poster_path == null) {
+                    $("#searchresult").append("<div class='col' onclick='moreInfo(" + response.results[i].id + ",0,0)'>" +
+                        "<img src='https://fakeimg.pl/145x210/F8F8F8/282828/?&text=no%20img' style='box-shadow: 0 0 0 0;'>" +
+                        "<p class='mtitle'>" + response.results[i].original_title + "</p>" +
+                        "</div>");
+                } else {
+                    $("#searchresult").append("<div class='col' onclick='moreInfo(" + response.results[i].id + ",0,0)'>" +
+                        "<img src='https://image.tmdb.org/t/p/w154/" + response.results[i].poster_path + "' style='width:145px'>" +
+                        "<p class='mtitle'>" + response.results[i].original_title + "</p>" +
+                        "</div>");
+                }
+
             }
         },
     });
@@ -227,10 +260,18 @@ function showWatchList(id) {
         data: "{}",
         success: function(response) {
             console.log(response);
-            $("#unwatch.result").append("<div class='col' onclick='moreInfo(" + response.id + ",1,0)'>" +
-                "<img src='https://image.tmdb.org/t/p/w154/" + response.poster_path + "' style='width:145px'>" +
-                "<p class='mtitle'>" + response.original_title + "</p>" +
-                "</div>");
+            if (response.poster_path == null) {
+                $("#unwatch").append("<div class='col' onclick='moreInfo(" + response.id + ",1,0)'>" +
+                    "<img src='https://fakeimg.pl/121x179/F8F8F8/282828/?&text=no%20img' style='box-shadow: 0 0 0 0;'>" +
+                    "<p class='mtitle'>" + response.original_title + "</p>" +
+                    "</div>");
+            } else {
+                $("#unwatch").append("<div class='col' onclick='moreInfo(" + response.id + ",1,0)'>" +
+                    "<img src='https://image.tmdb.org/t/p/w154/" + response.poster_path + "' style='width:145px'>" +
+                    "<p class='mtitle'>" + response.original_title + "</p>" +
+                    "</div>");
+            }
+
 
         },
     });
@@ -247,10 +288,18 @@ function showRatedList(id, rated) {
         data: "{}",
         success: function(response) {
             console.log(response);
-            $("#rated.result").append("<div class='col' onclick='moreInfo(" + response.id + ",0," + rated + ")'>" +
-                "<img src='https://image.tmdb.org/t/p/w154/" + response.poster_path + "' style='width:145px'>" +
-                "<p class='mtitle'>" + response.original_title + "</p>" +
-                "</div>");
+            if (response.poster_path == null) {
+                $("." + rated + "-rate").append("<div class='col' onclick='moreInfo(" + response.id + ",0," + rated + ")'>" +
+                    "<img src='https://fakeimg.pl/121x179/F8F8F8/282828/?&text=no%20img' style='box-shadow: 0 0 0 0;'>" +
+                    "<p class='mtitle'>" + response.original_title + "</p>" +
+                    "</div>");
+            } else {
+                $("." + rated + "-rate").append("<div class='col' onclick='moreInfo(" + response.id + ",0," + rated + ")'>" +
+                    "<img src='https://image.tmdb.org/t/p/w154/" + response.poster_path + "' style='width:145px'>" +
+                    "<p class='mtitle'>" + response.original_title + "</p>" +
+                    "</div>");
+            }
+
 
         },
     });
@@ -259,7 +308,9 @@ function showRatedList(id, rated) {
 function search(e) {
     e.preventDefault();
     var searchTitle = input.value;
-    console.log(searchTitle)
+    console.log(searchTitle);
+    $(".wresult").empty();
+    $(".catpage").hide();
     searchRequest(searchTitle);
     input.value = "";
     hidebox();
@@ -270,7 +321,7 @@ function search(e) {
     clearbut("#m-rec");
     nowbox = "result";
     showbottom(nowbox);
-    $(".result").text("");
+    //$(".result").text("");
 }
 
 
@@ -279,39 +330,82 @@ var input = document.querySelector('input[type="text"]');
 form.addEventListener("submit", search);
 
 
-function searchCat(cat, id) {
+function searchCat(cat, id, page) {
     $.ajax({
         async: true,
         crossDomain: true,
-        url: "https://api.themoviedb.org/3/discover/movie?api_key=129d4541708a331707bc51ae50d8373c&sort_by=popularity.desc&include_adult=false&include_video=false&with_genres=" + id,
+        url: "https://api.themoviedb.org/3/discover/movie?api_key=129d4541708a331707bc51ae50d8373c&sort_by=popularity.desc&page=" + page + "&with_genres=" + id,
         method: "GET",
         headers: {},
         data: "{}",
         success: function(response) {
             console.log(response);
-            $('#result .title').text(" 共 " + response.total_results + " 部電影");
+            $('#result .title').text(cat);
             for (i = 0; i < response.total_results; i++) {
-                $(".result").append("<div class='col' onclick='moreInfo(" + response.results[i].id + ",0,0)'>" +
-                    "<img src='https://image.tmdb.org/t/p/w154/" + response.results[i].poster_path + "' style='width:145px'>" +
-                    "<p class='mtitle'>" + response.results[i].original_title + "</p>" +
-                    "</div>");
+                if (response.results[i].poster_path == null) {
+                    $("#searchresult").append("<div class='col' onclick='moreInfo(" + response.results[i].id + ",0,0)'>" +
+                        "<img src='https://fakeimg.pl/145x210/F8F8F8/282828/?&text=no%20img' style='box-shadow: 0 0 0 0;'>" +
+                        "<p class='mtitle'>" + response.results[i].original_title + "</p>" +
+                        "</div>");
+                } else {
+                    $("#searchresult").append("<div class='col' onclick='moreInfo(" + response.results[i].id + ",0,0)'>" +
+                        "<img src='https://image.tmdb.org/t/p/w154/" + response.results[i].poster_path + "' style='width:145px'>" +
+                        "<p class='mtitle'>" + response.results[i].original_title + "</p>" +
+                        "</div>");
+                }
             }
 
         },
     });
 };
-
+var id, cat, page;
 $("category").click(function() {
-    var id, cat;
     id = $(this).children("id").text();
-    cat = $(this).text();
+    cat = $(this).clone().children().remove().end().text();
+    page = 1;
     console.log(id);
-    searchCat(cat, id);
+    $(".wresult").empty();
+    $(".catpage").show();
+    $(".fa-arrow-circle-left").hide();
+    searchCat(cat, id, page);
     hidebox();
     clearbut("#m-cat");
     nowbox = "result";
     showbottom(nowbox);
+    $("body").animate({ backgroundColor: "#F8F8F8" }, "1000");
+    $(".top").animate({ backgroundColor: "#F8F8F8" }, "1000");
     $("#" + nowbox).animate({ left: '120px' }, "slow");
     $("." + nowbox).animate({ width: '1130px' }, "slow");
-    $(".result").text("");
+})
+
+$(".changeUser").click(function() {
+    console.log("change user");
+    Android.restart();
+})
+var expand = false;
+$(".rated-title").click(function() {
+    if (expand == true)
+        $(this).next().animate({ height: '150px' });
+    else
+        $(this).next().animate({ height: '500px' });
+    expand = !(expand);
+
+})
+
+$(".fa-arrow-circle-right").click(function() {
+    console.log("he");
+    $(".wresult").empty();
+    page++;
+    searchCat(cat, id, page);
+    $(".fa-arrow-circle-left").show();
+})
+
+$(".fa-arrow-circle-left").click(function() {
+    console.log("he");
+    $(".wresult").empty();
+    page--;
+    searchCat(cat, id, page);
+    if (page == 1) {
+        $(".fa-arrow-circle-left").hide();
+    }
 })
