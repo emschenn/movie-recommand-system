@@ -7,57 +7,33 @@ $(document).ready(function() {
         method: "GET",
         dataType: "json",
         success: function(data) {
-            localStorage.setItem('name', data[0].name);
+            localStorage.setItem('name', data.name);
             console.log(data);
-            $('#helloname').text("Hello! " + data[0].name);
-            $('#neutral').text(data[0].neutral);
-            $('#happiness').text(data[0].happiness);
-            $('#surprise').text(data[0].surprise);
-            $('#sadness').text(data[0].sadness);
-            $('#anger').text(data[0].anger);
-            $('#disgust').text(data[0].disgust);
-            $('#fear').text(data[0].fear);
-            $('#contempt').text(data[0].contempt);
-            getMovieId(data[0].movie1, "#em.rec");
-            getMovieId(data[0].movie2, "#em.rec");
-            getMovieId(data[0].movie3, "#em.rec");
-            // getMovieId(data[0].movie4, "#em.rec");
-            // getMovieId(data[0].movie5, "#em.rec");
-            // getMovieId(data[0].movie6, "#em.rec");
-            // getMovieId(data[0].movie7, "#em.rec");
-            // getMovieId(data[0].movie8, "#em.rec");
-            // getMovieId(data[0].movie9, "#em.rec");
-            // getMovieId(data[0].movie10, "#em.rec");
-            /* bpr */
-            getMovieId(data[0].recommandation1, "#bpr.rec");
-            getMovieId(data[0].recommandation2, "#bpr.rec");
-            getMovieId(data[0].recommandation3, "#bpr.rec");
-            getMovieId(data[0].recommandation4, "#bpr.rec");
+            $('#helloname').text(data.name);
+            $('#neutral').text(data.neutral);
+            $('#happiness').text(data.happiness);
+            $('#surprise').text(data.surprise);
+            $('#sadness').text(data.sadness);
+            $('#anger').text(data.anger);
+            $('#disgust').text(data.disgust);
+            $('#fear').text(data.fear);
+            $('#contempt').text(data.contempt);
+            for (var i = 0; i < data.recommandation.length; i++) {
+                getMovieId(data.recommandation[i], "#em.rec");
 
-            getMovieId(data[0].recommandation5, "#bpr.rec");
+            }
+            for (var i = 0; i < data.movie.length; i++) {
+                getMovieId(data.movie[i], "#bpr.rec");
+
+            }
+
 
         },
         error: function(result) {
             console.log(result);
         }
     });
-    /* BPR 
-    $.ajax({
-        async: true,
-        crossDomain: true,
-        url: "http://192.168.210.32:8000/test/",
-        method: "GET",
-        dataType: "json",
-        success: function(data) {
-            console.log(data);
 
-            
-        },
-        error: function(result) {
-            console.log(result);
-        }
-    });
-*/
     /*hit this week*/
     $.ajax({
         async: true,

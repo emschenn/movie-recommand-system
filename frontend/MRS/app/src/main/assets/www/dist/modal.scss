@@ -1,6 +1,6 @@
 /* 1. Ensure this sits above everything when visible */
 
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css");
 .modal {
     position: absolute;
     z-index: 10000;
@@ -94,6 +94,7 @@
         }
         .m-button {
             position: absolute;
+            left: 500px;
             right: 25px;
             top: 13px;
             display: inline-block;

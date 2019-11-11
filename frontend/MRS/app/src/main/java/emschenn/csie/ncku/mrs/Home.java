@@ -35,6 +35,7 @@ public class Home extends AppCompatActivity {
 
         webView.setWebChromeClient(new WebChromeClient());
         //webView.loadDataWithBaseURL(getAssets(),s, "text/html", "utf-8", null);
+        webView.addJavascriptInterface(new AndroidtoJs(this), "Android");//AndroidtoJS类对象映射到js的test对象
         webView.loadUrl("file:///android_asset/www/dist/index.html");
         webView.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {

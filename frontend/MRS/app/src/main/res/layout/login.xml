@@ -72,6 +72,7 @@
         android:layout_marginStart="200dp"
         android:gravity="center"
         android:max="100"
+        android:progress="0"
         android:theme="@style/ProgressBarStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
