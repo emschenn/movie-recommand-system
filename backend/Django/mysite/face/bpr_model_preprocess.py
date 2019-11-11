@@ -11,6 +11,19 @@ import pickle
 
 from sql_search import get_movie_rating
 
+file = open('util_data/item_idx_dict.pickle', 'rb')
+item_idx_dict =pickle.load(file)
+file.close()
+# print(item_idx_dict)
+
+imdb_id = read_csv("../../../movie_data/MovieLens/ml-latest-small/links.csv",sep=",")
+
+def movieId_link_tmdb_to_id(id):
+    topic = imdb_id.loc[imdb_id['tmdbId'] == id]
+    # print('idididdididi', topic['tmdbId'].values)
+    if(topic['movieId'].values != None):
+        return int(float(''.join(str(i) for i in topic['movieId'].values)))
+
 
 
 negativeSampleCountPerPositive = 3
@@ -57,18 +70,18 @@ def readRatings():
 
         ratingMatrix[r] = [user, item, weight]
         # print(ratingMatrix)
-    # file = open('bpr_userNameToIndexDict.pickle', 'wb')
-    # pickle.dump(userNameToIndexDict, file)
-    # file.close()
-    # file = open('bpr_itemNameToIndexDict.pickle', 'wb')
-    # pickle.dump(itemNameToIndexDict, file)
-    # file.close()
-    # file = open('bpr_userIndexToNameDict.pickle', 'wb')
-    # pickle.dump(userIndexToNameDict, file)
-    # file.close()
-    # file = open('bpr_itemIndexToNameDict.pickle', 'wb')
-    # pickle.dump(itemIndexToNameDict, file)
-    # file.close()
+    file = open('BPR_data/bpr_userNameToIndexDict_611.pickle', 'wb')
+    pickle.dump(userNameToIndexDict, file)
+    file.close()
+    file = open('BPR_data/bpr_itemNameToIndexDict_611.pickle', 'wb')
+    pickle.dump(itemNameToIndexDict, file)
+    file.close()
+    file = open('BPR_data/bpr_userIndexToNameDict_611.pickle', 'wb')
+    pickle.dump(userIndexToNameDict, file)
+    file.close()
+    file = open('BPR_data/bpr_itemIndexToNameDict_611.pickle', 'wb')
+    pickle.dump(itemIndexToNameDict, file)
+    file.close()
 
 
     # return
@@ -120,12 +133,30 @@ if __name__ == '__main__':
 
     print(ratingMatrix.shape)
     for idx in range(len(movie)):
-        print(int(userCount))
-        add = np.array([int(userCount), int(movie[idx]), float(rating[idx])], ndmin=2)
-        print(add.shape)
-        ratingMatrix = np.concatenate((ratingMatrix, add))
+        # print(movie[idx])
+        # print(movieId_link_tmdb_to_id(float(movie[idx])))
+        id = movieId_link_tmdb_to_id(float(movie[idx]))
+        if id != None:
+            id = item_idx_dict.get(int(id))
+        print(id)
+        if id != None:
+            add = np.array([int(userCount), int(id), float(rating[idx])], ndmin=2)
+            print(add.shape)
+            ratingMatrix = np.concatenate((ratingMatrix, add))
 
     print(ratingMatrix)
+    userCount = int(ratingMatrix[: , 0].max()) + 1
+    itemCount = int(ratingMatrix[: , 1].max()) + 1
+
+
+    userNameToIndexDict = dict()
+    userIndexToNameDict = dict()
+    userIndex = 0
+
+    itemNameToIndexDict = dict()
+    itemIndexToNameDict = dict()
+    itemIndex = 0
+    readRatings()
     userCount = int(ratingMatrix[: , 0].max()) + 1
     itemCount = int(ratingMatrix[: , 1].max()) + 1
 
@@ -143,9 +174,9 @@ if __name__ == '__main__':
     cut = int(length/10)
     print(cut)
 
-    # file = open('bpr_userMatrix_train.pickle', 'wb')
-    # file2 = open('bpr_itemPositiveMatrix_train.pickle', 'wb')
-    # file3 = open('bpr_itemNegativeMatrix_train.pickle', 'wb')
+    # file = open('BPR_data/bpr_userMatrix_train_611.pickle', 'wb')
+    # file2 = open('BPR_data/bpr_itemPositiveMatrix_train_611.pickle', 'wb')
+    # file3 = open('BPR_data/bpr_itemNegativeMatrix_train_611.pickle', 'wb')
 
     # userMatrix_train = userMatrix[:length - cut]
     # itemPositiveMatrix_train = itemPositiveMatrix[:length - cut]
@@ -159,9 +190,9 @@ if __name__ == '__main__':
     # file2.close()
     # file3.close()
 
-    # file = open('bpr_userMatrix_test.pickle', 'wb')
-    # file2 = open('bpr_itemPositiveMatrix_test.pickle', 'wb')
-    # file3 = open('bpr_itemNegativeMatrix_test.pickle', 'wb')
+    # file = open('BPR_data/bpr_userMatrix_test_611.pickle', 'wb')
+    # file2 = open('BPR_data/bpr_itemPositiveMatrix_test_611.pickle', 'wb')
+    # file3 = open('BPR_data/bpr_itemNegativeMatrix_test_611.pickle', 'wb')
 
 
     # userMatrix_test = userMatrix[length - cut:]

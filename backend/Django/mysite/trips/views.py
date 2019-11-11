@@ -99,23 +99,7 @@ def img_post(request):
                 else:
                     return JsonResponse({'success' : 'yes', 'name' : str(ans), 'happiness' : str(happiness), 'anger' : str(anger), 'neutral' : str(neutral), 'fear' : str(fear), 'contempt' : str(contempt), 'disgust' : str(disgust), 'sadness' : str(sadness), 'surprise' : str(surprise), 'movie' : str(tmdbId), 'recommandation': recommendation})
     return JsonResponse({'success' : 'no', 'name' : ''})
-'''
-def img_post(request):
-    if request.method=='POST':
-            received_json_data=json.loads(request.body)
-            print(str(received_json_data))
-            imgdata = base64.b64decode(str(received_json_data['img']))
-            image = Image.open(BytesIO(imgdata))
-            image.show()
-            
-            image = request.FILES.get('img')
-            print('image', image)
-            im = Image.open(image)
-            im.show()
-            
-            return JsonResponse({'it was GET request' : 'qqq'})
-    return JsonResponse({'it was GET request' : 'qq'})
-'''
+
 
 def face_post(request):
     next_step = False

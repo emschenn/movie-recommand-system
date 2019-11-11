@@ -1,4 +1,4 @@
-# 引入 requests 模組
+# debug用檔案
 import requests
 import json
 
@@ -11,7 +11,6 @@ from io import BytesIO
 # pip3 install pillow
 from PIL import Image
 
-# 使用 GET 方式下載普通網頁
 # r = requests.get('http://127.0.0.1:8000/test/')
 url = 'http://127.0.0.1:8000/new_user_list/'
 data = ({'name': '1234', 'genres': ['Animation', 'Sci-Fi'], 'like': ['10193', '129', '181808', '49047']})
@@ -23,7 +22,7 @@ url = 'http://127.0.0.1:8000/post/'
 with open('../../../image/tmp_1.jpg', "rb") as imageFile:
     str1 = base64.b64encode(imageFile.read()).decode("utf-8")
 data = ({'img':str1})
-# r = requests.post(url, data=json.dumps(data), headers=headers)
+r = requests.post(url, data=json.dumps(data), headers=headers)
 files={'pic1':('test.png',open('../../../image/tmp_1.jpg','rb'),'image/png')}
 # r = requests.post(url, data=json.dumps(data), headers=headers)
 url = 'http://127.0.0.1:8000/add/'
@@ -77,7 +76,7 @@ headers = {'content-type': 'application/json'}
 url = 'http://127.0.0.1:8000/post_i2vId/'
 data = ({'id': 398818})
 headers = {'content-type': 'application/json'}
-r = requests.post(url, data=json.dumps(data), headers=headers)
+# r = requests.post(url, data=json.dumps(data), headers=headers)
 
 
 #r.json()
@@ -85,10 +84,3 @@ r = requests.post(url, data=json.dumps(data), headers=headers)
 print(r.status_code)
 print(r.text)
 # 檢查狀態碼是否 OK
-'''
-if r.status_code == requests.codes.ok:
-    print("OK")
-    # 輸出網頁 HTML 原始碼
-    #r.json()
-    print(r.text)
-'''

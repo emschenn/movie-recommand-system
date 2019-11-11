@@ -1,4 +1,4 @@
-
+# 主要SQL function
 import pymysql
 
 def user_search(target):
@@ -293,8 +293,8 @@ def rating_update(target, tmdbId, rating):
       movie_list = movie.split(',')
    if len(ratings) != 0:
       rating_list = ratings.split(',')
-   tmdbId_list = tmdbId.split(',')
-   tmdbId_rating_list = rating.split(',')
+   tmdbId_list = str(tmdbId).split(',')
+   tmdbId_rating_list = str(rating).split(',')
 
    
    print(len(movie_list))
@@ -664,11 +664,11 @@ if __name__=='__main__':
    # movie_exists('Elmo', 777)
    # favorite_update('Elmo', 862)
    # movie_update('jh1g')
-   # update_bpr('1234', 0)
-   # get_bpr('1234')
-   # clear_column('Elmo', 'watched_movie_id')
-   # clear_column('Elmo', 'rating')
-   rating_update('emschen', '862,949,710,687,9598', '3,4,5,4,5')
+   # update_bpr('emschen', 1)
+   get_bpr('1234')
+   # clear_column('', 'watched_movie_id')
+   # clear_column('', 'rating')
+   # rating_update('emschen', '862,949,710,687,9598', '3,4,5,4,5')
    # rating_update_test('1234')
    # movie, rating = get_movie_rating('1234')
    # md = dict()

@@ -10,27 +10,29 @@ from keras import backend as K
 import pickle
 
 
-file = open('bpr_userMatrix_train.pickle', 'rb')
+file = open('BPR_data/bpr_userMatrix_train_611.pickle', 'rb')
 bpr_userMatrix_train =pickle.load(file)
 file.close()
-file = open('bpr_itemPositiveMatrix_train.pickle', 'rb')
+file = open('BPR_data/bpr_itemPositiveMatrix_train_611.pickle', 'rb')
 bpr_itemPositiveMatrix_train =pickle.load(file)
 file.close()
-file = open('bpr_itemNegativeMatrix_train.pickle', 'rb')
+file = open('BPR_data/bpr_itemNegativeMatrix_train_611.pickle', 'rb')
 bpr_itemNegativeMatrix_train =pickle.load(file)
 file.close()
-file = open('bpr_userIndexToNameDict.pickle', 'rb')
+file = open('BPR_data/bpr_userIndexToNameDict_611.pickle', 'rb')
 userIndexToNameDict =pickle.load(file)
 file.close()
-file = open('bpr_itemIndexToNameDict.pickle', 'rb')
+file = open('BPR_data/bpr_itemIndexToNameDict_611.pickle', 'rb')
 itemIndexToNameDict =pickle.load(file)
 file.close()
 
+print(userIndexToNameDict)
+
 regularizationScale = 0
 embeddingDimension = 10
-userCount = 610
+userCount = 611
 itemCount = 9724
-epochCount = 1
+epochCount = 10
 batchSize = 256
 
 
@@ -100,36 +102,38 @@ userEmbeddingMatrix = userEmbeddingOutputModel.predict(userIndexMatrix)
 itemEmbeddingOutputModel = Model(inputs = itemPositiveInputLayer, outputs = itemPositiveEmbeddingLayer)
 itemEmbeddingMatrix = itemEmbeddingOutputModel.predict(itemIndexMatrix)
 
-# userNameVector = np.array([userIndexToNameDict[index] for index in range(userEmbeddingMatrix.shape[0])])
-# itemNameVector = np.array([itemIndexToNameDict[index] for index in range(itemEmbeddingMatrix.shape[0])])
+userNameVector = np.array([userIndexToNameDict[index] for index in range(userEmbeddingMatrix.shape[0])])
+itemNameVector = np.array([itemIndexToNameDict[index] for index in range(itemEmbeddingMatrix.shape[0])])
 
-# np.savetxt('bpr_userEmbeddingMatrix', np.hstack((userNameVector[np.newaxis].T, userEmbeddingMatrix)), fmt = "%g", header = "", delimiter = " ")
-# np.savetxt("bpr_itemEmbeddingMatrix", np.hstack((itemNameVector[np.newaxis].T, itemEmbeddingMatrix)), fmt = "%g", header = "", delimiter = " ")
+np.savetxt('BPR_data/bpr_userEmbeddingMatrix_611', np.hstack((userNameVector[np.newaxis].T, userEmbeddingMatrix)), fmt = "%g", header = "", delimiter = " ")
+np.savetxt("BPR_data/bpr_itemEmbeddingMatrix_611", np.hstack((itemNameVector[np.newaxis].T, itemEmbeddingMatrix)), fmt = "%g", header = "", delimiter = " ")
 # print(userEmbeddingMatrix)
 # print(itemEmbeddingMatrix)
 
-file = open('bpr_userMatrix_test.pickle', 'rb')
+file = open('BPR_data/bpr_userMatrix_test_611.pickle', 'rb')
 bpr_userMatrix_test =pickle.load(file)
 file.close()
-file = open('bpr_itemPositiveMatrix_test.pickle', 'rb')
+file = open('BPR_data/bpr_itemPositiveMatrix_test_611.pickle', 'rb')
 bpr_itemPositiveMatrix_test =pickle.load(file)
 file.close()
-file = open('bpr_itemNegativeMatrix_test.pickle', 'rb')
+file = open('BPR_data/bpr_itemNegativeMatrix_test_611.pickle', 'rb')
 bpr_itemNegativeMatrix_test =pickle.load(file)
 file.close()
 
 predict = np.mat(userEmbeddingMatrix) * np.mat(itemEmbeddingMatrix.T)
-print(predict)
+print(predict.shape)
 p = predict.tolist()
-
+# print((bpr_userMatrix_test))
+# print(len(bpr_itemPositiveMatrix_test))
 total = len(bpr_userMatrix_test)
 count = 0
 for idx in range(len(bpr_userMatrix_test)):
-    # print('postive', p[int(bpr_userMatrix_test[idx])][int(bpr_itemPositiveMatrix_test[idx])])
-    # print('negative', p[int(bpr_userMatrix_test[idx])][int(bpr_itemNegativeMatrix_test[idx])])
-    post = p[int(bpr_userMatrix_test[idx])][int(bpr_itemPositiveMatrix_test[idx])]
-    nega = p[int(bpr_userMatrix_test[idx])][int(bpr_itemNegativeMatrix_test[idx])]
-    if post > 0 and nega < 0 and post > nega:
-        count += 1
+        # print(idx)
+        # print('postive', p[int(bpr_userMatrix_test[idx])][int(bpr_itemPositiveMatrix_test[idx])])
+        # print('negative', p[int(bpr_userMatrix_test[idx])][int(bpr_itemNegativeMatrix_test[idx])])
+        post = p[int(bpr_userMatrix_test[idx])][int(bpr_itemPositiveMatrix_test[idx])]
+        nega = p[int(bpr_userMatrix_test[idx])][int(bpr_itemNegativeMatrix_test[idx])]
+        if post > 0 and nega < 0 and post > nega:
+                count += 1
 
 print(count / total)

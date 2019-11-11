@@ -1,3 +1,4 @@
+# i2v 呼叫和執行
 from keras.models import Model
 from keras.layers import Input, Dense, Reshape, merge, Dot, dot
 from keras.layers.embeddings import Embedding

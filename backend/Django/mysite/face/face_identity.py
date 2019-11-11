@@ -43,8 +43,8 @@ df['movieId'] = df['movieId'].map(ast.literal_eval)
 movie_dict = df.set_index('topic').T.to_dict('list')
 
 #BPR prediction
-user = np.loadtxt("face/BPR_data/bpr_userEmbeddingMatrix")
-item = np.loadtxt("face/BPR_data/bpr_itemEmbeddingMatrix")
+user = np.loadtxt("face/BPR_data/bpr_userEmbeddingMatrix_611")
+item = np.loadtxt("face/BPR_data/bpr_itemEmbeddingMatrix_611")
 user_embedding = np.delete(user, 0, 1)
 item_embedding = np.delete(item, 0, 1)
 item_idx = item[:,0].tolist()
@@ -238,8 +238,6 @@ def identify(path, faces):
     #print ('nice ', ttt[random.randint(0, 610)])
     
 
-    # You can use this example JPG or replace the URL below with your own URL to a JPEG image.
-    #img_url = 'D://禹竣//成大//專題//root//LIAO//1.jpg'
     img_url = path
     i = Image.open(img_url)
     #i.show()
@@ -272,8 +270,10 @@ def identify(path, faces):
         # model推薦電影
         bpr = sql_search.get_bpr(result)
         if bpr == 1:
-            Recommendation = choose_movie_by_data(5)  # [13, 278, 680, 9691, 451]
+            print('bpr= ', bpr)
+            Recommendation = choose_movie_by_data(610)  # [13, 278, 680, 9691, 451]
         else:
+            print('bpr= ', bpr)
             movie, rating = sql_search.get_movie_rating(result)
             new = dict()
             for index in range(len(movie)):

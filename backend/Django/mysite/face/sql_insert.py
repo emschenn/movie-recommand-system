@@ -1,5 +1,5 @@
 #!/usr/bin/python3
- 
+#  SQL練習用檔案
 import pymysql
 
 def insert(name, id, rating, favorite, topic):
