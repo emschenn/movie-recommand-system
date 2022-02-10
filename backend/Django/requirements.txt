@@ -6,7 +6,7 @@ chardet==3.0.4
 cognitive-face==1.4.2
 colorama==0.4.1
 decorator==4.4.0
-Django==2.2
+Django==2.2.27
 django-cors-headers==2.5.3
 django-pandas==0.6.1
 gast==0.2.2
